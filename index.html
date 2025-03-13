@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS Web 3D Simplificado</title>
+    <title>FPS Game Online</title>
     <style>
         * {
             margin: 0;
@@ -11,1638 +11,1198 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
-
         body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
             background-color: #000;
         }
-
-        #game-container {
-            position: relative;
+        #gameContainer {
             width: 100%;
             height: 100%;
         }
-
-        #loading-screen {
+        #menu {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background-color: #111;
-            color: #fff;
+            background: linear-gradient(#001f3f, #000);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            color: white;
         }
-
-        .progress-container {
-            width: 60%;
-            height: 20px;
-            background-color: #333;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        #progress-bar {
-            height: 100%;
-            width: 0;
-            background-color: #ff6700;
-            transition: width 0.3s ease-in-out;
-        }
-
-        #menu-screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #001f3f, #000000);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 90;
-        }
-
-        #menu-screen h1 {
-            font-size: 4em;
+        #title {
+            font-size: 3em;
             margin-bottom: 40px;
             color: #ff6700;
-            text-shadow: 0 0 10px rgba(255, 103, 0, 0.5);
         }
-
-        #menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        #menu-buttons button {
-            padding: 12px 30px;
+        .menuItem {
+            margin: 10px;
+            padding: 15px 30px;
             font-size: 1.2em;
-            background-color: #ff6700;
-            color: white;
             border: none;
             border-radius: 5px;
+            background-color: #ff6700;
+            color: white;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
-
-        #menu-buttons button:hover {
+        .menuItem:hover {
             background-color: #ff8533;
-            transform: scale(1.05);
         }
-
-        #join-form {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
+        #joinForm {
+            display: none;
+            margin-top: 20px;
         }
-
-        #game-id-input {
+        #gameId {
             padding: 10px;
             font-size: 1em;
             border-radius: 5px;
             border: none;
         }
-
-        #player-info {
-            margin-top: 20px;
-        }
-
-        #player-name {
-            padding: 10px 15px;
+        #nameInput {
+            padding: 10px;
             font-size: 1em;
             border-radius: 5px;
             border: none;
-            text-align: center;
-            width: 200px;
+            margin-bottom: 20px;
         }
-
-        #game-ui {
+        #gameUI {
             position: absolute;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 50;
             display: none;
+            pointer-events: none;
         }
-
-        #health-bar {
-            position: absolute;
-            left: 20px;
-            bottom: 20px;
-            width: 200px;
-            height: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border: 2px solid white;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        #health-fill {
-            height: 100%;
-            width: 100%;
-            background-color: #ff0000;
-            transition: width 0.3s ease;
-        }
-
-        #health-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-weight: bold;
-        }
-
-        #ammo-counter {
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
         #crosshair {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 12px;
-            height: 12px;
-            border: 2px solid white;
-            border-radius: 50%;
-            z-index: 1000;
-        }
-
-        #crosshair::before, #crosshair::after {
-            content: '';
-            position: absolute;
-            background-color: white;
-        }
-
-        #crosshair::before {
-            width: 2px;
-            height: 6px;
-            top: 3px;
-            left: 5px;
-        }
-
-        #crosshair::after {
-            width: 6px;
-            height: 2px;
-            top: 5px;
-            left: 3px;
-        }
-
-        #game-id-display {
-            position: absolute;
-            top: 10px;
-            left: 10px;
             color: white;
-            background-color: rgba(0, 0, 0, 0.5);
+            font-size: 2em;
+        }
+        #health {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.5);
             padding: 5px 10px;
             border-radius: 5px;
         }
-
-        #players-list {
+        #ammo {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            bottom: 20px;
+            right: 20px;
             color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #playersList {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
             border-radius: 5px;
             max-width: 200px;
         }
-
-        #kill-feed {
+        #gameCode {
             position: absolute;
-            top: 10px;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #killFeed {
+            position: absolute;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             color: white;
             width: 300px;
-            max-height: 150px;
-            overflow: hidden;
+            text-align: center;
         }
-
-        .kill-message {
-            background-color: rgba(0, 0, 0, 0.5);
+        .killMessage {
+            background: rgba(0,0,0,0.5);
             padding: 5px 10px;
             margin-bottom: 5px;
             border-radius: 5px;
-            animation: fadeOut 4s forwards;
+            animation: fadeOut 3s forwards;
         }
-
         @keyframes fadeOut {
             0% { opacity: 1; }
             70% { opacity: 1; }
             100% { opacity: 0; }
         }
-
-        #game-over-screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 80;
-            display: none;
-        }
-
-        #game-over-screen h2 {
-            font-size: 3em;
-            margin-bottom: 30px;
-            color: #ff6700;
-        }
-
-        #results {
-            margin-bottom: 30px;
-            font-size: 1.2em;
-            text-align: center;
-        }
-
-        #game-over-screen button {
-            padding: 10px 25px;
-            margin: 10px;
-            font-size: 1.1em;
-            background-color: #ff6700;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #game-over-screen button:hover {
-            background-color: #ff8533;
-        }
-
-        #instructions {
-            margin-top: 30px;
-            text-align: center;
-            max-width: 600px;
-        }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="loading-screen">
-            <h1>CS Web 3D</h1>
-            <div class="progress-container">
-                <div id="progress-bar"></div>
+    <div id="gameContainer">
+        <div id="menu">
+            <h1 id="title">FPS Game Online</h1>
+            <input type="text" id="nameInput" placeholder="Seu nome" maxlength="16">
+            <button id="createBtn" class="menuItem">Criar Jogo</button>
+            <button id="joinBtn" class="menuItem">Entrar em Jogo</button>
+            <div id="joinForm">
+                <input type="text" id="gameId" placeholder="Código do jogo">
+                <button id="connectBtn" class="menuItem">Conectar</button>
             </div>
-            <p id="loading-text">Carregando...</p>
-        </div>
-        
-        <div id="menu-screen">
-            <h1>CS Web 3D</h1>
-            <div id="menu-buttons">
-                <button id="create-game-btn">Criar Jogo</button>
-                <button id="join-game-btn">Entrar em Jogo</button>
-                <div id="join-form" style="display: none;">
-                    <input type="text" id="game-id-input" placeholder="Código do jogo">
-                    <button id="connect-btn">Conectar</button>
-                </div>
-            </div>
-            <div id="player-info">
-                <input type="text" id="player-name" placeholder="Seu nome" maxlength="16">
-            </div>
-            <div id="instructions">
-                <h3>Instruções</h3>
+            <div style="margin-top: 40px; text-align: center;">
+                <h3>Controles:</h3>
                 <p>WASD - Movimento</p>
                 <p>Mouse - Olhar</p>
                 <p>Clique - Atirar</p>
                 <p>R - Recarregar</p>
-                <p>1-3 - Mudar armas</p>
+                <p>F - Mudar Arma</p>
                 <p>Espaço - Pular</p>
-                <p>T - Chat</p>
-                <p>ESC - Liberar mouse</p>
-                <p>F11 - Tela cheia</p>
+                <p>Esc - Menu</p>
             </div>
         </div>
-        
-        <div id="game-ui">
-            <div id="health-bar">
-                <div id="health-fill"></div>
-                <span id="health-text">100</span>
-            </div>
-            <div id="ammo-counter">30/90</div>
-            <div id="crosshair"></div>
-            <div id="game-id-display"></div>
-            <div id="players-list"></div>
-            <div id="kill-feed"></div>
-        </div>
-        
-        <div id="game-over-screen">
-            <h2>Fim de Jogo</h2>
-            <div id="results"></div>
-            <button id="play-again-btn">Jogar Novamente</button>
-            <button id="exit-btn">Sair</button>
+        <div id="gameUI">
+            <div id="crosshair">+</div>
+            <div id="health">Vida: 100</div>
+            <div id="ammo">Munição: 30/90</div>
+            <div id="playersList"></div>
+            <div id="gameCode"></div>
+            <div id="killFeed"></div>
         </div>
     </div>
+
+    <!-- Carregando as bibliotecas com vários CDNs de backup -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.2/dist/peerjs.min.js"></script>
     
-    <!-- Bibliotecas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.132.2/three.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-    
-    <!-- Script Simplificado -->
     <script>
-        // Constantes do jogo
-        const GAME_STATES = {
-            LOADING: 'loading',
-            MENU: 'menu',
-            PLAYING: 'playing',
-            GAME_OVER: 'gameOver'
-        };
-
-        const PLAYER = {
-            HEALTH: 100,
-            MOVE_SPEED: 10,
-            JUMP_FORCE: 10,
-            HEIGHT: 1.8,
-            RADIUS: 0.5
-        };
-
-        const WEAPONS = {
-            PISTOL: {
-                name: 'Pistol',
-                damage: 25,
-                fireRate: 0.3,
-                magazineSize: 12,
-                totalAmmo: 36,
-                reloadTime: 1.2,
-                spread: 0.02
-            },
-            RIFLE: {
-                name: 'Rifle',
-                damage: 15,
-                fireRate: 0.1,
-                magazineSize: 30,
-                totalAmmo: 90,
-                reloadTime: 2.0,
-                spread: 0.015
-            },
-            SHOTGUN: {
-                name: 'Shotgun',
-                damage: 8,
-                fireRate: 0.7,
-                magazineSize: 8,
-                totalAmmo: 32,
-                reloadTime: 2.5,
-                spread: 0.1,
-                pellets: 8
+        // Esperar o DOM carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se THREE foi carregado corretamente
+            if (typeof THREE === 'undefined') {
+                alert('Erro ao carregar Three.js. Tente recarregar a página ou use outro navegador.');
+                return;
             }
-        };
 
-        const PHYSICS = {
-            GRAVITY: 9.8,
-            FRICTION: 0.9
-        };
-
-        const NETWORK = {
-            UPDATE_RATE: 16
-        };
-
-        const MAP = {
-            SIZE: 50,
-            WALL_HEIGHT: 4
-        };
-
-        // Utilitários
-        function generateGameId() {
-            return Math.random().toString(36).substring(2, 10);
-        }
-
-        function getRandomColor() {
-            return Math.random() * 0xffffff;
-        }
-
-        function showNotification(message) {
-            const killFeed = document.getElementById('kill-feed');
-            const notification = document.createElement('div');
-            notification.className = 'kill-message';
-            notification.textContent = message;
-            killFeed.appendChild(notification);
-            
-            setTimeout(() => {
-                if (killFeed.contains(notification)) {
-                    killFeed.removeChild(notification);
-                }
-            }, 4000);
-        }
-
-        // Classe Game simplificada
-        class Game {
-            constructor() {
-                this.state = GAME_STATES.LOADING;
-                this.scene = null;
-                this.camera = null;
-                this.renderer = null;
-                this.players = {};
-                this.localPlayer = null;
-                this.network = null;
-                this.controls = null;
-                this.lastTime = 0;
-                this.isHost = false;
-                
-                // Movimento
-                this.moveForward = false;
-                this.moveBackward = false;
-                this.moveLeft = false;
-                this.moveRight = false;
-                this.shooting = false;
-                
-                // Inicializa o jogo
-                this.init();
+            // Verificar se Peer foi carregado corretamente
+            if (typeof Peer === 'undefined') {
+                alert('Erro ao carregar PeerJS. Tente recarregar a página ou use outro navegador.');
+                return;
             }
+
+            // Constantes
+            const PLAYER_HEIGHT = 1.8;
+            const PLAYER_RADIUS = 0.5;
+            const MOVE_SPEED = 0.15;
+            const JUMP_FORCE = 0.3;
+            const MAP_SIZE = 40;
+            const GRAVITY = 0.01;
             
-            init() {
-                // Criar renderizador WebGL
-                this.renderer = new THREE.WebGLRenderer({ antialias: true });
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                this.renderer.setClearColor(0x87ceeb); // Céu azul
-                document.getElementById('game-container').appendChild(this.renderer.domElement);
-                
+            // Elementos da UI
+            const menu = document.getElementById('menu');
+            const gameUI = document.getElementById('gameUI');
+            const createBtn = document.getElementById('createBtn');
+            const joinBtn = document.getElementById('joinBtn');
+            const connectBtn = document.getElementById('connectBtn');
+            const joinForm = document.getElementById('joinForm');
+            const nameInput = document.getElementById('nameInput');
+            const gameIdInput = document.getElementById('gameId');
+            const healthUI = document.getElementById('health');
+            const ammoUI = document.getElementById('ammo');
+            const playersListUI = document.getElementById('playersList');
+            const gameCodeUI = document.getElementById('gameCode');
+            const killFeedUI = document.getElementById('killFeed');
+            const gameContainer = document.getElementById('gameContainer');
+            
+            // Estado do jogo
+            let scene, camera, renderer;
+            let playerObject, playerBox;
+            let players = {};
+            let peer, connections = {};
+            let gameId = null;
+            let isHost = false;
+            let isPlaying = false;
+            let movement = { forward: false, backward: false, left: false, right: false };
+            let mouseControls = { x: 0, y: 0 };
+            let isPointerLocked = false;
+            let velocity = { x: 0, y: 0, z: 0 };
+            let onGround = true;
+            let health = 100;
+            let ammo = { current: 30, total: 90 };
+            let isDead = false;
+            let kills = 0;
+            let deaths = 0;
+            let weaponType = 'rifle';
+            let isReloading = false;
+            
+            // Inicialização do Three.js
+            function initGame() {
                 // Criar cena
-                this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x87ceeb);
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87CEEB); // Céu azul
                 
                 // Criar câmera
-                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.camera.position.y = PLAYER.HEIGHT;
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.y = PLAYER_HEIGHT;
                 
-                // Iniciar rede
-                this.network = new Network(this);
-                
-                // Definir eventos
-                this.setupEvents();
-                
-                // Simular carregamento e ir para o menu
-                setTimeout(() => {
-                    document.getElementById('progress-bar').style.width = '100%';
-                    document.getElementById('loading-text').textContent = 'Carregando... 100%';
-                    setTimeout(() => {
-                        this.setState(GAME_STATES.MENU);
-                    }, 500);
-                }, 1000);
-            }
-            
-            setupEvents() {
-                // Eventos de redimensionamento
-                window.addEventListener('resize', () => {
-                    this.camera.aspect = window.innerWidth / window.innerHeight;
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-                
-                // Eventos de teclado
-                document.addEventListener('keydown', (e) => this.onKeyDown(e));
-                document.addEventListener('keyup', (e) => this.onKeyUp(e));
-                
-                // Eventos de mouse
-                document.addEventListener('mousedown', (e) => this.onMouseDown(e));
-                document.addEventListener('mouseup', (e) => this.onMouseUp(e));
-                document.addEventListener('mousemove', (e) => this.onMouseMove(e));
-                
-                // Botões do menu
-                document.getElementById('create-game-btn').addEventListener('click', () => this.createGame());
-                document.getElementById('join-game-btn').addEventListener('click', () => {
-                    const joinForm = document.getElementById('join-form');
-                    joinForm.style.display = joinForm.style.display === 'none' ? 'block' : 'none';
-                });
-                document.getElementById('connect-btn').addEventListener('click', () => this.joinGame());
-                
-                // Botões da tela de fim de jogo
-                document.getElementById('play-again-btn').addEventListener('click', () => this.restartGame());
-                document.getElementById('exit-btn').addEventListener('click', () => this.returnToMenu());
-            }
-            
-            setState(newState) {
-                this.state = newState;
-                
-                // Atualizar interface com base no estado
-                document.getElementById('loading-screen').style.display = newState === GAME_STATES.LOADING ? 'flex' : 'none';
-                document.getElementById('menu-screen').style.display = newState === GAME_STATES.MENU ? 'flex' : 'none';
-                document.getElementById('game-ui').style.display = newState === GAME_STATES.PLAYING ? 'block' : 'none';
-                document.getElementById('game-over-screen').style.display = newState === GAME_STATES.GAME_OVER ? 'flex' : 'none';
-                
-                if (this.renderer) {
-                    this.renderer.domElement.style.display = newState === GAME_STATES.PLAYING ? 'block' : 'none';
-                }
-            }
-            
-            createGame() {
-                // Pegar nome do jogador
-                const playerName = document.getElementById('player-name').value.trim() || `Player${Math.floor(Math.random() * 1000)}`;
-                
-                // Criar jogo na rede
-                const gameId = this.network.createGame();
-                this.isHost = true;
+                // Criar renderizador
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                gameContainer.appendChild(renderer.domElement);
                 
                 // Criar mapa
-                this.createMap();
+                createMap();
                 
-                // Criar jogador local
-                this.createLocalPlayer(playerName);
+                // Criar jogador
+                createPlayer();
                 
-                // Iniciar jogo
-                this.startGame();
+                // Adicionar luzes
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                directionalLight.position.set(1, 1, 1);
+                scene.add(directionalLight);
+                
+                // Adicionar eventos
+                window.addEventListener('resize', onWindowResize);
+                document.addEventListener('keydown', onKeyDown);
+                document.addEventListener('keyup', onKeyUp);
+                document.addEventListener('mousedown', onMouseDown);
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('pointerlockchange', onPointerLockChange);
+                
+                // Iniciar animação
+                animate();
             }
             
-            joinGame() {
-                // Pegar nome do jogador e ID do jogo
-                const playerName = document.getElementById('player-name').value.trim() || `Player${Math.floor(Math.random() * 1000)}`;
-                const gameId = document.getElementById('game-id-input').value.trim();
-                
-                if (!gameId) {
-                    alert('Por favor, insira o código do jogo.');
-                    return;
-                }
-                
-                // Entrar no jogo
-                this.network.joinGame(gameId);
-                
-                // Criar mapa
-                this.createMap();
-                
-                // Criar jogador local
-                this.createLocalPlayer(playerName);
-                
-                // Iniciar jogo
-                this.startGame();
-            }
-            
-            createMap() {
-                // Criar chão
-                const floorGeometry = new THREE.PlaneGeometry(MAP.SIZE, MAP.SIZE);
-                const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x444444 });
+            // Criar mapa básico
+            function createMap() {
+                // Chão
+                const floorGeometry = new THREE.PlaneGeometry(MAP_SIZE, MAP_SIZE);
+                const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
                 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
                 floor.rotation.x = -Math.PI / 2;
-                this.scene.add(floor);
+                floor.receiveShadow = true;
+                scene.add(floor);
                 
-                // Criar paredes
-                const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x777777 });
+                // Paredes externas
+                const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x777777 });
                 
-                // Parede norte
-                const northWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(MAP.SIZE, MAP.WALL_HEIGHT, 1),
+                // Norte
+                const wallN = new THREE.Mesh(
+                    new THREE.BoxGeometry(MAP_SIZE, 5, 1),
                     wallMaterial
                 );
-                northWall.position.set(0, MAP.WALL_HEIGHT / 2, -MAP.SIZE / 2);
-                this.scene.add(northWall);
+                wallN.position.set(0, 2.5, -MAP_SIZE/2);
+                scene.add(wallN);
                 
-                // Parede sul
-                const southWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(MAP.SIZE, MAP.WALL_HEIGHT, 1),
+                // Sul
+                const wallS = new THREE.Mesh(
+                    new THREE.BoxGeometry(MAP_SIZE, 5, 1),
                     wallMaterial
                 );
-                southWall.position.set(0, MAP.WALL_HEIGHT / 2, MAP.SIZE / 2);
-                this.scene.add(southWall);
+                wallS.position.set(0, 2.5, MAP_SIZE/2);
+                scene.add(wallS);
                 
-                // Parede leste
-                const eastWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(1, MAP.WALL_HEIGHT, MAP.SIZE),
+                // Leste
+                const wallE = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 5, MAP_SIZE),
                     wallMaterial
                 );
-                eastWall.position.set(MAP.SIZE / 2, MAP.WALL_HEIGHT / 2, 0);
-                this.scene.add(eastWall);
+                wallE.position.set(MAP_SIZE/2, 2.5, 0);
+                scene.add(wallE);
                 
-                // Parede oeste
-                const westWall = new THREE.Mesh(
-                    new THREE.BoxGeometry(1, MAP.WALL_HEIGHT, MAP.SIZE),
+                // Oeste
+                const wallW = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 5, MAP_SIZE),
                     wallMaterial
                 );
-                westWall.position.set(-MAP.SIZE / 2, MAP.WALL_HEIGHT / 2, 0);
-                this.scene.add(westWall);
+                wallW.position.set(-MAP_SIZE/2, 2.5, 0);
+                scene.add(wallW);
                 
-                // Adicionar luz
-                const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-                this.scene.add(ambientLight);
+                // Obstáculos
+                for (let i = 0; i < 10; i++) {
+                    const size = 1 + Math.random() * 3;
+                    const x = (Math.random() - 0.5) * (MAP_SIZE - size);
+                    const z = (Math.random() - 0.5) * (MAP_SIZE - size);
+                    
+                    const box = new THREE.Mesh(
+                        new THREE.BoxGeometry(size, size, size),
+                        new THREE.MeshStandardMaterial({ color: 0x8B4513 })
+                    );
+                    box.position.set(x, size/2, z);
+                    scene.add(box);
+                }
             }
             
-            createLocalPlayer(name) {
-                // Criar jogador local
-                this.localPlayer = {
-                    id: this.network.peer.id,
-                    name: name,
-                    health: PLAYER.HEALTH,
-                    position: new THREE.Vector3(0, PLAYER.HEIGHT, 0),
-                    rotation: new THREE.Euler(),
-                    color: 0x0000ff,
-                    model: null,
+            // Criar jogador
+            function createPlayer() {
+                // Grupo para o jogador
+                playerObject = new THREE.Group();
+                
+                // Corpo do jogador
+                const geometry = new THREE.BoxGeometry(PLAYER_RADIUS * 2, PLAYER_HEIGHT, PLAYER_RADIUS * 2);
+                const material = new THREE.MeshStandardMaterial({ color: 0x0000FF });
+                playerBox = new THREE.Mesh(geometry, material);
+                playerBox.position.y = PLAYER_HEIGHT / 2;
+                playerObject.add(playerBox);
+                
+                // Adicionar à cena
+                scene.add(playerObject);
+                
+                // Posicionar câmera
+                camera.position.set(0, PLAYER_HEIGHT, 0);
+                
+                // Armazenar jogador local na lista
+                const myId = peer ? peer.id : 'local';
+                players[myId] = {
+                    id: myId,
+                    name: nameInput.value || 'Player',
+                    object: playerObject,
+                    health: 100,
+                    ammo: { current: 30, total: 90 },
+                    weaponType: 'rifle',
                     isDead: false,
                     kills: 0,
                     deaths: 0,
-                    currentWeapon: 'RIFLE',
-                    ammo: {
-                        PISTOL: {
-                            current: WEAPONS.PISTOL.magazineSize,
-                            total: WEAPONS.PISTOL.totalAmmo
-                        },
-                        RIFLE: {
-                            current: WEAPONS.RIFLE.magazineSize,
-                            total: WEAPONS.RIFLE.totalAmmo
-                        },
-                        SHOTGUN: {
-                            current: WEAPONS.SHOTGUN.magazineSize,
-                            total: WEAPONS.SHOTGUN.totalAmmo
-                        }
-                    },
+                    isReloading: false
+                };
+            }
+            
+            // Criar jogador remoto
+            function createRemotePlayer(id, name, position) {
+                // Se já existe, atualizar posição
+                if (players[id]) {
+                    players[id].object.position.copy(position);
+                    return;
+                }
+                
+                // Grupo para o jogador
+                const playerObj = new THREE.Group();
+                
+                // Corpo do jogador
+                const geometry = new THREE.BoxGeometry(PLAYER_RADIUS * 2, PLAYER_HEIGHT, PLAYER_RADIUS * 2);
+                const material = new THREE.MeshStandardMaterial({ color: 0xFF0000 });
+                const box = new THREE.Mesh(geometry, material);
+                box.position.y = PLAYER_HEIGHT / 2;
+                playerObj.add(box);
+                
+                // Posicionar
+                playerObj.position.copy(position);
+                
+                // Adicionar à cena
+                scene.add(playerObj);
+                
+                // Armazenar na lista
+                players[id] = {
+                    id: id,
+                    name: name,
+                    object: playerObj,
+                    health: 100,
+                    ammo: { current: 30, total: 90 },
+                    weaponType: 'rifle',
+                    isDead: false,
+                    kills: 0,
+                    deaths: 0,
                     isReloading: false
                 };
                 
-                // Criar modelo 3D do jogador
-                const geometry = new THREE.BoxGeometry(PLAYER.RADIUS * 2, PLAYER.HEIGHT, PLAYER.RADIUS * 2);
-                const material = new THREE.MeshBasicMaterial({ color: this.localPlayer.color });
-                this.localPlayer.model = new THREE.Mesh(geometry, material);
-                this.localPlayer.model.position.copy(this.localPlayer.position);
-                
-                // Adicionar à cena
-                this.scene.add(this.localPlayer.model);
-                
-                // Adicionar à lista de jogadores
-                this.players[this.localPlayer.id] = this.localPlayer;
-                
-                // Atualizar posição da câmera
-                this.camera.position.copy(this.localPlayer.position);
+                // Atualizar lista de jogadores
+                updatePlayersList();
             }
             
-            addRemotePlayer(playerInfo) {
-                // Pular se o jogador já existe
-                if (this.players[playerInfo.id]) {
-                    this.updateRemotePlayer(playerInfo);
-                    return;
-                }
+            // Redimensionar janela
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+            // Controle de teclado
+            function onKeyDown(event) {
+                if (!isPlaying) return;
                 
-                // Criar novo jogador remoto
-                const player = {
-                    id: playerInfo.id,
-                    name: playerInfo.name,
-                    health: playerInfo.health || PLAYER.HEALTH,
-                    position: new THREE.Vector3().copy(playerInfo.position),
-                    rotation: new THREE.Euler().copy(playerInfo.rotation),
-                    color: 0xff0000,
-                    model: null,
-                    isDead: playerInfo.isDead || false,
-                    kills: playerInfo.kills || 0,
-                    deaths: playerInfo.deaths || 0,
-                    currentWeapon: playerInfo.currentWeapon || 'RIFLE',
-                    isReloading: playerInfo.isReloading || false
-                };
-                
-                // Criar modelo 3D do jogador
-                const geometry = new THREE.BoxGeometry(PLAYER.RADIUS * 2, PLAYER.HEIGHT, PLAYER.RADIUS * 2);
-                const material = new THREE.MeshBasicMaterial({ color: player.color });
-                player.model = new THREE.Mesh(geometry, material);
-                player.model.position.copy(player.position);
-                
-                // Adicionar à cena
-                this.scene.add(player.model);
-                
-                // Adicionar à lista de jogadores
-                this.players[player.id] = player;
-                
-                // Atualizar UI
-                this.updatePlayersList();
-                
-                // Se somos o host, informar outros jogadores
-                if (this.isHost) {
-                    this.network.broadcast({
-                        type: 'player-join',
-                        player: this.serializePlayer(player)
-                    }, [player.id]);
+                switch (event.code) {
+                    case 'KeyW':
+                    case 'ArrowUp':
+                        movement.forward = true;
+                        break;
+                    case 'KeyS':
+                    case 'ArrowDown':
+                        movement.backward = true;
+                        break;
+                    case 'KeyA':
+                    case 'ArrowLeft':
+                        movement.left = true;
+                        break;
+                    case 'KeyD':
+                    case 'ArrowRight':
+                        movement.right = true;
+                        break;
+                    case 'Space':
+                        if (onGround) {
+                            velocity.y = JUMP_FORCE;
+                            onGround = false;
+                        }
+                        break;
+                    case 'KeyR':
+                        reload();
+                        break;
+                    case 'KeyF':
+                        switchWeapon();
+                        break;
+                    case 'Escape':
+                        if (isPointerLocked) {
+                            document.exitPointerLock();
+                        }
+                        break;
                 }
             }
             
-            updateRemotePlayer(playerInfo) {
-                const player = this.players[playerInfo.id];
-                if (!player) return;
+            function onKeyUp(event) {
+                if (!isPlaying) return;
                 
-                // Atualizar posição e rotação
-                if (playerInfo.position) {
-                    player.position.copy(playerInfo.position);
-                    player.model.position.copy(playerInfo.position);
+                switch (event.code) {
+                    case 'KeyW':
+                    case 'ArrowUp':
+                        movement.forward = false;
+                        break;
+                    case 'KeyS':
+                    case 'ArrowDown':
+                        movement.backward = false;
+                        break;
+                    case 'KeyA':
+                    case 'ArrowLeft':
+                        movement.left = false;
+                        break;
+                    case 'KeyD':
+                    case 'ArrowRight':
+                        movement.right = false;
+                        break;
                 }
-                
-                if (playerInfo.rotation) {
-                    player.rotation.copy(playerInfo.rotation);
-                    player.model.rotation.copy(playerInfo.rotation);
-                }
-                
-                // Atualizar informações do jogador
-                player.health = playerInfo.health || player.health;
-                player.isDead = playerInfo.isDead || player.isDead;
-                player.kills = playerInfo.kills || player.kills;
-                player.deaths = playerInfo.deaths || player.deaths;
-                player.currentWeapon = playerInfo.currentWeapon || player.currentWeapon;
-                player.isReloading = playerInfo.isReloading || player.isReloading;
-                
-                // Atualizar visibilidade com base no status de morte
-                player.model.visible = !player.isDead;
-                
-                // Atualizar UI
-                this.updatePlayersList();
             }
             
-            startGame() {
-                // Definir estado como jogando
-                this.setState(GAME_STATES.PLAYING);
+            // Controle de mouse
+            function onMouseDown(event) {
+                if (!isPlaying || !isPointerLocked) return;
                 
-                // Configurar controles do mouse para o modo FPS
-                this.setupMouseControls();
-                
-                // Iniciar loop do jogo
-                this.lastTime = performance.now();
-                this.gameLoop();
-            }
-            
-            setupMouseControls() {
-                // Variáveis para controle do mouse
-                this.mouseSensitivity = 0.002;
-                this.pitchObject = new THREE.Object3D();
-                this.yawObject = new THREE.Object3D();
-                this.yawObject.add(this.pitchObject);
-                this.pitchObject.add(this.camera);
-                
-                this.isPointerLocked = false;
-                
-                // Adicionar à cena
-                this.scene.add(this.yawObject);
-                
-                // Configurar bloqueio do ponteiro
-                document.addEventListener('click', () => {
-                    if (this.state === GAME_STATES.PLAYING && !this.isPointerLocked) {
-                        document.body.requestPointerLock();
-                    }
-                });
-                
-                document.addEventListener('pointerlockchange', () => {
-                    this.isPointerLocked = document.pointerLockElement === document.body;
-                });
-            }
-            
-            onMouseMove(event) {
-                if (this.state !== GAME_STATES.PLAYING || !this.isPointerLocked) {
-                    return;
+                if (event.button === 0) { // botão esquerdo
+                    shoot();
                 }
+            }
+            
+            function onMouseMove(event) {
+                if (!isPlaying || !isPointerLocked) return;
                 
-                // Movimentação da câmera com o mouse
                 const movementX = event.movementX || 0;
                 const movementY = event.movementY || 0;
                 
-                this.yawObject.rotation.y -= movementX * this.mouseSensitivity;
-                this.pitchObject.rotation.x -= movementY * this.mouseSensitivity;
+                // Rotação horizontal
+                camera.rotation.y -= movementX * 0.002;
                 
-                // Limitar rotação vertical
-                this.pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, this.pitchObject.rotation.x));
-                
-                // Atualizar rotação do jogador local
-                if (this.localPlayer) {
-                    this.localPlayer.rotation.y = this.yawObject.rotation.y;
-                }
+                // Rotação vertical (limitada)
+                mouseControls.y -= movementY * 0.002;
+                mouseControls.y = Math.max(-Math.PI/2, Math.min(Math.PI/2, mouseControls.y));
+                camera.rotation.x = mouseControls.y;
             }
             
-            onKeyDown(event) {
-                if (this.state !== GAME_STATES.PLAYING) {
-                    return;
-                }
-                
-                switch (event.code) {
-                    case 'KeyW':
-                    case 'ArrowUp':
-                        this.moveForward = true;
-                        break;
-                    case 'KeyS':
-                    case 'ArrowDown':
-                        this.moveBackward = true;
-                        break;
-                    case 'KeyA':
-                    case 'ArrowLeft':
-                        this.moveLeft = true;
-                        break;
-                    case 'KeyD':
-                    case 'ArrowRight':
-                        this.moveRight = true;
-                        break;
-                    case 'Space':
-                        this.jump();
-                        break;
-                    case 'KeyR':
-                        this.reload();
-                        break;
-                    case 'Digit1':
-                        this.switchWeapon('PISTOL');
-                        break;
-                    case 'Digit2':
-                        this.switchWeapon('RIFLE');
-                        break;
-                    case 'Digit3':
-                        this.switchWeapon('SHOTGUN');
-                        break;
-                    case 'KeyT':
-                        const message = prompt('Digite sua mensagem:');
-                        if (message) {
-                            this.sendChatMessage(message);
-                        }
-                        break;
-                    case 'Escape':
-                        document.exitPointerLock();
-                        break;
-                    case 'F11':
-                        this.toggleFullscreen();
-                        break;
-                }
+            // Controle de bloqueio do ponteiro
+            function onPointerLockChange() {
+                isPointerLocked = document.pointerLockElement === document.body;
             }
             
-            onKeyUp(event) {
-                if (this.state !== GAME_STATES.PLAYING) {
-                    return;
-                }
-                
-                switch (event.code) {
-                    case 'KeyW':
-                    case 'ArrowUp':
-                        this.moveForward = false;
-                        break;
-                    case 'KeyS':
-                    case 'ArrowDown':
-                        this.moveBackward = false;
-                        break;
-                    case 'KeyA':
-                    case 'ArrowLeft':
-                        this.moveLeft = false;
-                        break;
-                    case 'KeyD':
-                    case 'ArrowRight':
-                        this.moveRight = false;
-                        break;
-                }
-            }
-            
-            onMouseDown(event) {
-                if (this.state !== GAME_STATES.PLAYING || !this.isPointerLocked) {
-                    return;
-                }
-                
-                if (event.button === 0) { // Clique esquerdo
-                    this.shooting = true;
-                    this.shoot();
-                }
-            }
-            
-            onMouseUp(event) {
-                if (event.button === 0) {
-                    this.shooting = false;
-                }
-            }
-            
-            toggleFullscreen() {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => {
-                        console.error('Erro ao ativar tela cheia:', err);
-                    });
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
-                }
-            }
-            
-            jump() {
-                if (!this.localPlayer || this.localPlayer.isDead) {
-                    return;
-                }
-                
-                // Lógica de pulo simplificada
-                this.localPlayer.position.y += PLAYER.JUMP_FORCE / 10;
-            }
-            
-            shoot() {
-                if (!this.localPlayer || this.localPlayer.isDead || this.localPlayer.isReloading) {
-                    return;
-                }
-                
-                const weapon = WEAPONS[this.localPlayer.currentWeapon];
-                const ammo = this.localPlayer.ammo[this.localPlayer.currentWeapon];
-                
-                if (ammo.current <= 0) {
-                    this.reload();
-                    return;
-                }
+            // Funções de jogabilidade
+            function shoot() {
+                if (isDead || isReloading || ammo.current <= 0) return;
                 
                 // Diminuir munição
                 ammo.current--;
                 
                 // Atualizar UI
-                this.updateAmmoDisplay();
+                updateAmmoUI();
                 
-                // Criar raycaster para detectar tiros
-                const direction = new THREE.Vector3(0, 0, -1);
-                direction.applyQuaternion(this.camera.quaternion);
+                // Raycasting para detectar colisões
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
                 
-                const raycaster = new THREE.Raycaster(this.camera.position, direction);
-                
-                // Verificar colisões com outros jogadores
+                // Verificar todos os jogadores exceto o local
                 const targets = [];
-                
-                for (const id in this.players) {
-                    if (id === this.localPlayer.id || this.players[id].isDead) {
-                        continue;
+                for (const id in players) {
+                    if (id !== peer.id && !players[id].isDead) {
+                        targets.push(players[id].object.children[0]); // playerBox
                     }
-                    
-                    targets.push(this.players[id].model);
                 }
+                
+                // Se não há alvos, não continuar
+                if (targets.length === 0) return;
                 
                 const intersects = raycaster.intersectObjects(targets);
                 
                 if (intersects.length > 0) {
+                    // Identificar jogador atingido
                     const hitObject = intersects[0].object;
                     let hitPlayerId = null;
                     
-                    // Encontrar o jogador atingido
-                    for (const id in this.players) {
-                        if (this.players[id].model === hitObject) {
+                    for (const id in players) {
+                        if (players[id].object.children[0] === hitObject) {
                             hitPlayerId = id;
                             break;
                         }
                     }
                     
                     if (hitPlayerId) {
-                        // Causar dano
-                        this.network.sendHitInfo(hitPlayerId, weapon.damage);
+                        // Calcular dano baseado na arma
+                        let damage = 0;
+                        switch (weaponType) {
+                            case 'pistol': damage = 20; break;
+                            case 'rifle': damage = 10; break;
+                            case 'shotgun': damage = 30; break;
+                        }
                         
-                        // Efeito visual de tiro
-                        showNotification(`Você atingiu ${this.players[hitPlayerId].name}!`);
+                        // Enviar informação de hit
+                        sendHitInfo(hitPlayerId, damage);
+                        
+                        // Mostrar feedback
+                        addKillFeedMessage(`Você atingiu ${players[hitPlayerId].name}`);
                     }
                 }
                 
-                // Programar próximo tiro se estiver segurando o botão
-                if (this.shooting) {
-                    setTimeout(() => this.shoot(), weapon.fireRate * 1000);
+                // Verificar recarga
+                if (ammo.current === 0 && ammo.total > 0) {
+                    reload();
                 }
             }
             
-            takeDamage(amount, attackerId) {
-                if (!this.localPlayer || this.localPlayer.isDead) {
-                    return false;
-                }
+            function reload() {
+                if (isDead || isReloading || ammo.current === 30 || ammo.total === 0) return;
                 
-                this.localPlayer.health -= amount;
+                isReloading = true;
                 
                 // Atualizar UI
-                this.updateHealthDisplay();
+                ammoUI.textContent = 'Recarregando...';
+                
+                // Tempo de recarga
+                setTimeout(() => {
+                    const needed = 30 - ammo.current;
+                    const available = Math.min(needed, ammo.total);
+                    
+                    ammo.total -= available;
+                    ammo.current += available;
+                    
+                    isReloading = false;
+                    
+                    // Atualizar UI
+                    updateAmmoUI();
+                    
+                    // Atualizar dados remotos
+                    sendPlayerUpdate();
+                }, 2000);
+            }
+            
+            function switchWeapon() {
+                if (isDead || isReloading) return;
+                
+                // Ciclar entre as armas
+                switch (weaponType) {
+                    case 'pistol': weaponType = 'rifle'; break;
+                    case 'rifle': weaponType = 'shotgun'; break;
+                    case 'shotgun': weaponType = 'pistol'; break;
+                }
+                
+                // Atualizar UI
+                updateAmmoUI();
+                
+                // Atualizar dados remotos
+                sendPlayerUpdate();
+            }
+            
+            function takeDamage(amount, attackerId) {
+                if (isDead) return false;
+                
+                health -= amount;
+                health = Math.max(0, health);
+                
+                // Atualizar UI
+                updateHealthUI();
                 
                 // Verificar morte
-                if (this.localPlayer.health <= 0) {
-                    this.localPlayer.health = 0;
-                    this.die(attackerId);
+                if (health <= 0) {
+                    die(attackerId);
                     return true;
                 }
                 
                 return false;
             }
             
-            die(killerId) {
-                if (!this.localPlayer) {
-                    return;
-                }
+            function die(killerId) {
+                isDead = true;
+                deaths++;
                 
-                this.localPlayer.isDead = true;
-                this.localPlayer.deaths++;
-                
-                // Ocultar modelo
-                this.localPlayer.model.visible = false;
-                
-                // Mostrar mensagem de morte
-                if (killerId && this.players[killerId]) {
-                    showNotification(`${this.players[killerId].name} eliminou você!`);
+                // Adicionar kill para o assassino
+                if (killerId && players[killerId]) {
+                    players[killerId].kills++;
                     
-                    // Incrementar kill para o assassino
-                    if (this.players[killerId]) {
-                        this.players[killerId].kills++;
-                    }
+                    // Mensagem no feed
+                    addKillFeedMessage(`${players[killerId].name} eliminou você!`);
                 } else {
-                    showNotification('Você morreu!');
+                    addKillFeedMessage('Você morreu!');
                 }
+                
+                // Ocultar jogador
+                playerBox.visible = false;
+                
+                // Atualizar UI
+                updatePlayersList();
+                
+                // Enviar atualização
+                sendPlayerUpdate();
                 
                 // Respawn após um tempo
-                setTimeout(() => this.respawn(), 5000);
+                setTimeout(respawn, 5000);
             }
             
-            respawn() {
-                if (!this.localPlayer) {
-                    return;
-                }
-                
-                this.localPlayer.isDead = false;
-                this.localPlayer.health = PLAYER.HEALTH;
-                
-                // Posição aleatória no mapa
-                this.localPlayer.position.set(
-                    (Math.random() - 0.5) * MAP.SIZE * 0.8,
-                    PLAYER.HEIGHT,
-                    (Math.random() - 0.5) * MAP.SIZE * 0.8
-                );
-                
-                // Mostrar modelo
-                this.localPlayer.model.visible = true;
-                
-                // Reposicionar câmera
-                this.yawObject.position.copy(this.localPlayer.position);
-                
-                // Recarregar munição
-                for (const weaponType in WEAPONS) {
-                    this.localPlayer.ammo[weaponType].current = WEAPONS[weaponType].magazineSize;
-                }
-                
-                // Atualizar UI
-                this.updateHealthDisplay();
-                this.updateAmmoDisplay();
-                
-                // Mostrar mensagem
-                showNotification('Você renasceu!');
-            }
-            
-            reload() {
-                if (!this.localPlayer || this.localPlayer.isDead || this.localPlayer.isReloading) {
-                    return;
-                }
-                
-                const weapon = WEAPONS[this.localPlayer.currentWeapon];
-                const ammo = this.localPlayer.ammo[this.localPlayer.currentWeapon];
-                
-                if (ammo.current === weapon.magazineSize || ammo.total === 0) {
-                    return;
-                }
-                
-                this.localPlayer.isReloading = true;
-                
-                // Atualizar UI
-                document.getElementById('ammo-counter').textContent = 'Recarregando...';
-                
-                // Recarregar após um tempo
-                setTimeout(() => {
-                    const needed = weapon.magazineSize - ammo.current;
-                    const available = Math.min(needed, ammo.total);
-                    
-                    ammo.current += available;
-                    ammo.total -= available;
-                    
-                    this.localPlayer.isReloading = false;
-                    
-                    // Atualizar UI
-                    this.updateAmmoDisplay();
-                }, weapon.reloadTime * 1000);
-            }
-            
-            switchWeapon(weaponType) {
-                if (!this.localPlayer || this.localPlayer.isDead || this.localPlayer.isReloading) {
-                    return;
-                }
-                
-                this.localPlayer.currentWeapon = weaponType;
-                
-                // Atualizar UI
-                this.updateAmmoDisplay();
-            }
-            
-            updateHealthDisplay() {
-                if (!this.localPlayer) {
-                    return;
-                }
-                
-                const healthFill = document.getElementById('health-fill');
-                const healthText = document.getElementById('health-text');
-                
-                healthFill.style.width = `${this.localPlayer.health}%`;
-                healthText.textContent = Math.ceil(this.localPlayer.health);
-            }
-            
-            updateAmmoDisplay() {
-                if (!this.localPlayer) {
-                    return;
-                }
-                
-                const ammo = this.localPlayer.ammo[this.localPlayer.currentWeapon];
-                document.getElementById('ammo-counter').textContent = `${ammo.current}/${ammo.total}`;
-            }
-            
-            updatePlayersList() {
-                const playersList = document.getElementById('players-list');
-                let html = '<h3>Jogadores</h3>';
-                
-                for (const id in this.players) {
-                    const player = this.players[id];
-                    html += `<div>${player.name}${id === this.localPlayer?.id ? ' (você)' : ''}: ${player.kills} eliminações</div>`;
-                }
-                
-                playersList.innerHTML = html;
-            }
-            
-            sendChatMessage(message) {
-                if (!this.localPlayer) {
-                    return;
-                }
-                
-                this.network.sendChatMessage(message);
-                showNotification(`${this.localPlayer.name}: ${message}`);
-            }
-            
-            gameLoop() {
-                if (this.state !== GAME_STATES.PLAYING) {
-                    return;
-                }
-                
-                const now = performance.now();
-                const deltaTime = (now - this.lastTime) / 1000;
-                this.lastTime = now;
-                
-                // Atualizar posição do jogador com base nos controles
-                if (this.localPlayer && !this.localPlayer.isDead) {
-                    // Criar vetor de direção
-                    const direction = new THREE.Vector3();
-                    
-                    if (this.moveForward) direction.z -= 1;
-                    if (this.moveBackward) direction.z += 1;
-                    if (this.moveLeft) direction.x -= 1;
-                    if (this.moveRight) direction.x += 1;
-                    
-                    if (direction.length() > 0) {
-                        // Normalizar e aplicar velocidade
-                        direction.normalize();
-                        
-                        // Aplicar rotação da câmera
-                        direction.applyQuaternion(this.camera.quaternion);
-                        direction.y = 0; // Manter movimento no plano
-                        direction.normalize();
-                        
-                        // Mover o jogador
-                        this.localPlayer.position.x += direction.x * PLAYER.MOVE_SPEED * deltaTime;
-                        this.localPlayer.position.z += direction.z * PLAYER.MOVE_SPEED * deltaTime;
-                        
-                        // Limitar movimento ao tamanho do mapa
-                        const halfSize = MAP.SIZE / 2 - PLAYER.RADIUS;
-                        this.localPlayer.position.x = Math.max(-halfSize, Math.min(halfSize, this.localPlayer.position.x));
-                        this.localPlayer.position.z = Math.max(-halfSize, Math.min(halfSize, this.localPlayer.position.z));
-                        
-                        // Atualizar posição do modelo e da câmera
-                        this.localPlayer.model.position.copy(this.localPlayer.position);
-                        this.yawObject.position.copy(this.localPlayer.position);
-                    }
-                }
-                
-                // Enviar atualizações de rede
-                this.network.sendPlayerUpdate();
-                
-                // Renderizar cena
-                this.renderer.render(this.scene, this.camera);
-                
-                // Continuar loop
-                requestAnimationFrame(() => this.gameLoop());
-            }
-            
-            restartGame() {
-                // Esconder tela de fim de jogo
-                this.setState(GAME_STATES.PLAYING);
-                
-                // Reiniciar jogadores
-                for (const id in this.players) {
-                    const player = this.players[id];
-                    
-                    if (player.isDead) {
-                        player.isDead = false;
-                        player.health = PLAYER.HEALTH;
-                        player.model.visible = true;
-                    }
-                }
-                
-                // Reposicionar jogador local
-                this.respawn();
-                
-                // Retomar jogo
-                this.lastTime = performance.now();
-                this.gameLoop();
-            }
-            
-            returnToMenu() {
-                // Limpar jogo e voltar ao menu
-                this.cleanup();
-                this.setState(GAME_STATES.MENU);
-            }
-            
-            cleanup() {
-                // Remover todos os jogadores
-                for (const id in this.players) {
-                    if (this.players[id].model) {
-                        this.scene.remove(this.players[id].model);
-                    }
-                }
-                
-                // Limpar lista de jogadores
-                this.players = {};
-                this.localPlayer = null;
-                
-                // Encerrar conexões de rede
-                if (this.network) {
-                    this.network.dispose();
-                }
-                
-                // Limpar UI
-                document.getElementById('kill-feed').innerHTML = '';
-                document.getElementById('players-list').innerHTML = '';
+            function respawn() {
+                if (!isDead) return;
                 
                 // Restaurar estado
-                this.moveForward = false;
-                this.moveBackward = false;
-                this.moveLeft = false;
-                this.moveRight = false;
-                this.shooting = false;
+                isDead = false;
+                health = 100;
+                ammo = { current: 30, total: 90 };
+                isReloading = false;
                 
-                // Desbloquear ponteiro
-                this.isPointerLocked = false;
-                if (document.pointerLockElement) {
-                    document.exitPointerLock();
-                }
+                // Posição aleatória no mapa
+                const x = (Math.random() - 0.5) * (MAP_SIZE - 4);
+                const z = (Math.random() - 0.5) * (MAP_SIZE - 4);
+                playerObject.position.set(x, 0, z);
+                camera.position.set(x, PLAYER_HEIGHT, z);
+                
+                // Mostrar modelo
+                playerBox.visible = true;
+                
+                // Atualizar UI
+                updateHealthUI();
+                updateAmmoUI();
+                updatePlayersList();
+                
+                // Mensagem no feed
+                addKillFeedMessage('Você renasceu!');
+                
+                // Enviar atualização
+                sendPlayerUpdate();
             }
             
-            serializePlayer(player) {
-                return {
-                    id: player.id,
-                    name: player.name,
-                    health: player.health,
-                    position: {
-                        x: player.position.x,
-                        y: player.position.y,
-                        z: player.position.z
-                    },
-                    rotation: {
-                        x: player.rotation.x,
-                        y: player.rotation.y,
-                        z: player.rotation.z
-                    },
-                    isDead: player.isDead,
-                    kills: player.kills,
-                    deaths: player.deaths,
-                    currentWeapon: player.currentWeapon,
-                    isReloading: player.isReloading
-                };
+            // Funções de UI
+            function updateHealthUI() {
+                healthUI.textContent = `Vida: ${health}`;
             }
-        }
-
-        // Classe Network simplificada
-        class Network {
-            constructor(game) {
-                this.game = game;
-                this.peer = null;
-                this.connections = {};
-                this.isHost = false;
-                this.gameId = null;
+            
+            function updateAmmoUI() {
+                ammoUI.textContent = `${weaponType.charAt(0).toUpperCase() + weaponType.slice(1)}: ${ammo.current}/${ammo.total}`;
+            }
+            
+            function updatePlayersList() {
+                let html = '<h3>Jogadores</h3>';
+                
+                for (const id in players) {
+                    const player = players[id];
+                    html += `<div>${player.name} (${player.kills}/${player.deaths})</div>`;
+                }
+                
+                playersListUI.innerHTML = html;
+            }
+            
+            function addKillFeedMessage(message) {
+                const msgElement = document.createElement('div');
+                msgElement.className = 'killMessage';
+                msgElement.textContent = message;
+                
+                killFeedUI.appendChild(msgElement);
+                
+                // Remover após animação
+                setTimeout(() => {
+                    if (killFeedUI.contains(msgElement)) {
+                        killFeedUI.removeChild(msgElement);
+                    }
+                }, 3000);
+            }
+            
+            // Animação do jogo
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                if (isPlaying) {
+                    // Gravidade
+                    if (!onGround) {
+                        velocity.y -= GRAVITY;
+                    }
+                    
+                    // Movimento do jogador
+                    const direction = new THREE.Vector3();
+                    
+                    // Frente/trás
+                    if (movement.forward) direction.z -= 1;
+                    if (movement.backward) direction.z += 1;
+                    
+                    // Esquerda/direita
+                    if (movement.left) direction.x -= 1;
+                    if (movement.right) direction.x += 1;
+                    
+                    // Normalizar e rotacionar direção
+                    if (direction.length() > 0) {
+                        direction.normalize();
+                        
+                        // Rotacionar com base na câmera
+                        direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), camera.rotation.y);
+                        
+                        // Aplicar movimento
+                        velocity.x = direction.x * MOVE_SPEED;
+                        velocity.z = direction.z * MOVE_SPEED;
+                    } else {
+                        // Desacelerar
+                        velocity.x *= 0.9;
+                        velocity.z *= 0.9;
+                    }
+                    
+                    // Aplicar velocidade
+                    playerObject.position.x += velocity.x;
+                    playerObject.position.y += velocity.y;
+                    playerObject.position.z += velocity.z;
+                    
+                    // Verificar colisão com o chão
+                    if (playerObject.position.y < 0) {
+                        playerObject.position.y = 0;
+                        velocity.y = 0;
+                        onGround = true;
+                    }
+                    
+                    // Limitar movimento ao mapa
+                    const border = MAP_SIZE / 2 - PLAYER_RADIUS;
+                    playerObject.position.x = Math.max(-border, Math.min(border, playerObject.position.x));
+                    playerObject.position.z = Math.max(-border, Math.min(border, playerObject.position.z));
+                    
+                    // Sincronizar câmera com jogador
+                    camera.position.x = playerObject.position.x;
+                    camera.position.z = playerObject.position.z;
+                    camera.position.y = playerObject.position.y + PLAYER_HEIGHT;
+                    
+                    // Enviar atualização de posição
+                    const now = Date.now();
+                    if (now - lastUpdate > 50) { // Limitar para não sobrecarregar a rede
+                        sendPlayerUpdate();
+                        lastUpdate = now;
+                    }
+                }
+                
+                renderer.render(scene, camera);
+            }
+            
+            // Funções de rede
+            function initNetwork() {
+                // Gerar ID aleatório
+                const peerId = generateId();
                 
                 // Inicializar PeerJS
-                this.initPeer();
-            }
-            
-            initPeer() {
-                // Criar ID aleatório
-                const peerId = generateGameId();
+                peer = new Peer(peerId);
                 
-                // Inicializar peer
-                this.peer = new Peer(peerId);
-                
-                // Configurar eventos
-                this.peer.on('open', (id) => {
-                    console.log('Connected to PeerJS server with ID:', id);
+                // Evento de conexão
+                peer.on('open', (id) => {
+                    console.log('Connected with ID: ' + id);
                 });
                 
-                this.peer.on('error', (error) => {
-                    console.error('PeerJS error:', error);
-                    
-                    // Mostrar erro mais amigável
-                    if (error.type === 'peer-unavailable') {
-                        alert('Código de jogo inválido ou jogo não encontrado.');
-                    } else {
-                        alert('Erro de conexão. Por favor, tente novamente.');
-                    }
+                // Lidar com erros
+                peer.on('error', (err) => {
+                    console.error('PeerJS error:', err);
+                    alert('Erro de conexão: ' + err.message);
                 });
                 
-                this.peer.on('connection', (conn) => {
-                    this.handleConnection(conn);
+                // Receber conexões
+                peer.on('connection', (conn) => {
+                    handleConnection(conn);
                 });
             }
             
-            handleConnection(conn) {
+            function createHostGame() {
+                if (!peer) {
+                    alert('Erro ao conectar ao servidor. Tente novamente.');
+                    return;
+                }
+                
+                // Gerar código do jogo (usando o peer ID)
+                gameId = peer.id;
+                isHost = true;
+                
+                // Exibir código
+                gameCodeUI.textContent = `Código: ${gameId}`;
+                
+                // Iniciar jogo
+                startGame();
+            }
+            
+            function joinExistingGame() {
+                const hostId = gameIdInput.value.trim();
+                
+                if (!hostId) {
+                    alert('Por favor, insira o código do jogo.');
+                    return;
+                }
+                
+                // Conectar ao host
+                const conn = peer.connect(hostId);
+                
                 conn.on('open', () => {
-                    console.log('New connection:', conn.peer);
+                    console.log('Connected to host!');
                     
-                    // Adicionar à lista
-                    this.connections[conn.peer] = conn;
+                    // Armazenar conexão
+                    connections[hostId] = conn;
                     
-                    // Se somos o host, confirmar e enviar estado
-                    if (this.isHost) {
-                        conn.send({
-                            type: 'host-confirm',
-                            gameId: this.gameId
-                        });
-                        
-                        // Enviar estado atual
-                        this.sendGameState(conn);
-                    }
+                    // Armazenar código do jogo
+                    gameId = hostId;
+                    isHost = false;
                     
-                    // Configurar tratamento de dados
+                    // Exibir código
+                    gameCodeUI.textContent = `Código: ${gameId}`;
+                    
+                    // Enviar informações do jogador
+                    sendPlayerJoin(conn);
+                    
+                    // Configurar recebimento de dados
                     conn.on('data', (data) => {
-                        this.handleData(data, conn.peer);
+                        handleData(data, hostId);
                     });
                     
-                    // Gerenciar desconexão
+                    // Lidar com desconexão
                     conn.on('close', () => {
-                        console.log('Connection closed:', conn.peer);
+                        alert('Desconectado do host. Voltando ao menu.');
+                        endGame();
+                    });
+                    
+                    // Iniciar jogo
+                    startGame();
+                });
+                
+                conn.on('error', (err) => {
+                    console.error('Connection error:', err);
+                    alert('Erro ao conectar ao jogo. Verifique o código e tente novamente.');
+                });
+            }
+            
+            function handleConnection(conn) {
+                console.log('New player connecting:', conn.peer);
+                
+                conn.on('open', () => {
+                    // Armazenar conexão
+                    connections[conn.peer] = conn;
+                    
+                    // Configurar recebimento de dados
+                    conn.on('data', (data) => {
+                        handleData(data, conn.peer);
+                    });
+                    
+                    // Lidar com desconexão
+                    conn.on('close', () => {
+                        console.log('Player disconnected:', conn.peer);
                         
-                        // Remover da lista
-                        delete this.connections[conn.peer];
+                        // Remover conexão
+                        delete connections[conn.peer];
                         
                         // Remover jogador
-                        if (this.game.players[conn.peer]) {
-                            this.game.scene.remove(this.game.players[conn.peer].model);
-                            delete this.game.players[conn.peer];
+                        if (players[conn.peer]) {
+                            scene.remove(players[conn.peer].object);
+                            delete players[conn.peer];
                             
                             // Atualizar UI
-                            this.game.updatePlayersList();
+                            updatePlayersList();
                             
-                            // Informar os outros jogadores
-                            if (this.isHost) {
-                                this.broadcast({
-                                    type: 'player-disconnected',
-                                    playerId: conn.peer
-                                });
+                            // Notificar outros jogadores
+                            if (isHost) {
+                                broadcast({
+                                    type: 'player_leave',
+                                    id: conn.peer
+                                }, [conn.peer]);
                             }
-                            
-                            // Mostrar notificação
-                            showNotification(`${this.game.players[conn.peer]?.name || 'Um jogador'} saiu do jogo.`);
                         }
                     });
                 });
             }
             
-            handleData(data, senderId) {
+            function handleData(data, senderId) {
                 switch (data.type) {
-                    case 'host-confirm':
-                        this.gameId = data.gameId;
-                        document.getElementById('game-id-display').textContent = `Código: ${this.gameId}`;
-                        break;
+                    case 'player_join':
+                        // Criar jogador remoto
+                        createRemotePlayer(data.id, data.name, data.position);
                         
-                    case 'game-state':
-                        // Adicionar jogadores
-                        if (data.players) {
-                            for (const id in data.players) {
-                                if (id !== this.peer.id) {
-                                    this.game.addRemotePlayer(data.players[id]);
+                        // Se somos o host, informar outros jogadores
+                        if (isHost) {
+                            broadcast({
+                                type: 'player_join',
+                                id: data.id,
+                                name: data.name,
+                                position: data.position
+                            }, [data.id]);
+                            
+                            // Enviar informações de outros jogadores
+                            for (const id in players) {
+                                if (id !== peer.id && id !== data.id) {
+                                    connections[data.id].send({
+                                        type: 'player_join',
+                                        id: id,
+                                        name: players[id].name,
+                                        position: {
+                                            x: players[id].object.position.x,
+                                            y: players[id].object.position.y,
+                                            z: players[id].object.position.z
+                                        }
+                                    });
                                 }
                             }
                         }
                         break;
                         
-                    case 'player-join':
-                        this.game.addRemotePlayer(data.player);
-                        // Mostrar notificação
-                        showNotification(`${data.player.name} entrou no jogo!`);
+                    case 'player_update':
+                        if (players[data.id]) {
+                            // Atualizar posição
+                            players[data.id].object.position.set(
+                                data.position.x,
+                                data.position.y,
+                                data.position.z
+                            );
+                            
+                            // Atualizar rotação
+                            if (data.rotation) {
+                                players[data.id].object.rotation.set(
+                                    data.rotation.x,
+                                    data.rotation.y,
+                                    data.rotation.z
+                                );
+                            }
+                            
+                            // Atualizar status
+                            players[data.id].health = data.health;
+                            players[data.id].isDead = data.isDead;
+                            players[data.id].weaponType = data.weaponType;
+                            players[data.id].isReloading = data.isReloading;
+                            players[data.id].kills = data.kills;
+                            players[data.id].deaths = data.deaths;
+                            
+                            // Atualizar visibilidade
+                            players[data.id].object.children[0].visible = !data.isDead;
+                            
+                            // Atualizar UI
+                            updatePlayersList();
+                        }
                         break;
                         
-                    case 'player-update':
-                        this.game.updateRemotePlayer(data.player);
-                        break;
-                        
-                    case 'player-disconnected':
-                        if (this.game.players[data.playerId]) {
-                            this.game.scene.remove(this.game.players[data.playerId].model);
-                            // Mostrar notificação
-                            showNotification(`${this.game.players[data.playerId]?.name || 'Um jogador'} saiu do jogo.`);
-                            delete this.game.players[data.playerId];
-                            this.game.updatePlayersList();
+                    case 'player_leave':
+                        if (players[data.id]) {
+                            scene.remove(players[data.id].object);
+                            delete players[data.id];
+                            
+                            // Atualizar UI
+                            updatePlayersList();
                         }
                         break;
                         
                     case 'hit':
-                        if (data.targetId === this.peer.id) {
+                        if (data.targetId === peer.id) {
                             // Fomos atingidos
-                            const killed = this.game.takeDamage(data.damage, data.attackerId);
+                            const killed = takeDamage(data.damage, data.attackerId);
                             
-                            // Confirmar o hit para o host
-                            if (this.isHost || data.attackerId === this.peer.id) {
-                                this.sendTo(data.attackerId, {
-                                    type: 'hit-confirm',
-                                    targetId: data.targetId,
-                                    killed: killed
-                                });
-                            }
+                            // Enviar confirmação
+                            sendTo(data.attackerId, {
+                                type: 'hit_confirm',
+                                targetId: peer.id,
+                                killed: killed
+                            });
                         }
                         break;
                         
-                    case 'hit-confirm':
-                        if (data.killed && this.game.players[data.targetId]) {
-                            // O jogador morreu
-                            this.game.players[data.targetId].isDead = true;
-                            this.game.players[data.targetId].deaths++;
-                            this.game.players[data.targetId].model.visible = false;
-                            
-                            // Adicionar kill ao jogador local se foi quem atirou
-                            if (data.attackerId === this.peer.id && this.game.localPlayer) {
-                                this.game.localPlayer.kills++;
-                                showNotification(`Você eliminou ${this.game.players[data.targetId].name}!`);
-                            }
+                    case 'hit_confirm':
+                        if (data.killed && players[data.targetId]) {
+                            // Atualizar kill count
+                            kills++;
                             
                             // Atualizar UI
-                            this.game.updatePlayersList();
+                            updatePlayersList();
+                            
+                            // Mensagem no feed
+                            addKillFeedMessage(`Você eliminou ${players[data.targetId].name}!`);
                         }
                         break;
-                        
-                    case 'chat-message':
-                        showNotification(`${data.playerName}: ${data.message}`);
-                        break;
                 }
             }
             
-            createGame() {
-                this.isHost = true;
-                this.gameId = generateGameId();
-                document.getElementById('game-id-display').textContent = `Código: ${this.gameId}`;
-                return this.gameId;
-            }
-            
-            joinGame(gameId) {
-                if (!gameId) {
-                    alert('Código de jogo inválido.');
-                    return false;
-                }
-                
-                this.gameId = gameId;
-                document.getElementById('game-id-display').textContent = `Código: ${this.gameId}`;
-                
-                // Conexão com o host
-                const conn = this.peer.connect(gameId);
-                
-                conn.on('open', () => {
-                    console.log('Connected to host!');
-                    this.connections[gameId] = conn;
-                    
-                    // Enviar informações do jogador local
-                    if (this.game.localPlayer) {
-                        conn.send({
-                            type: 'player-join',
-                            player: this.game.serializePlayer(this.game.localPlayer)
-                        });
+            function sendPlayerJoin(connection) {
+                connection.send({
+                    type: 'player_join',
+                    id: peer.id,
+                    name: nameInput.value || 'Player',
+                    position: {
+                        x: playerObject.position.x,
+                        y: playerObject.position.y,
+                        z: playerObject.position.z
                     }
-                    
-                    // Configurar tratamento de dados
-                    conn.on('data', (data) => {
-                        this.handleData(data, gameId);
-                    });
-                    
-                    // Gerenciar desconexão
-                    conn.on('close', () => {
-                        console.log('Disconnected from host');
-                        alert('Desconectado do jogo. Voltando ao menu.');
-                        this.game.returnToMenu();
-                    });
-                });
-                
-                conn.on('error', (error) => {
-                    console.error('Connection error:', error);
-                    alert('Erro ao conectar ao jogo. Verifique o código e tente novamente.');
-                    return false;
-                });
-                
-                return true;
-            }
-            
-            sendGameState(conn) {
-                // Serializar todos os jogadores
-                const players = {};
-                
-                for (const id in this.game.players) {
-                    players[id] = this.game.serializePlayer(this.game.players[id]);
-                }
-                
-                // Enviar estado
-                conn.send({
-                    type: 'game-state',
-                    players: players
                 });
             }
             
-            sendPlayerUpdate() {
-                if (!this.game.localPlayer) {
-                    return;
-                }
+            let lastUpdate = 0;
+            
+            function sendPlayerUpdate() {
+                // Preparar dados
+                const data = {
+                    type: 'player_update',
+                    id: peer.id,
+                    position: {
+                        x: playerObject.position.x,
+                        y: playerObject.position.y,
+                        z: playerObject.position.z
+                    },
+                    rotation: {
+                        x: camera.rotation.x,
+                        y: camera.rotation.y,
+                        z: camera.rotation.z
+                    },
+                    health: health,
+                    isDead: isDead,
+                    weaponType: weaponType,
+                    isReloading: isReloading,
+                    kills: kills,
+                    deaths: deaths
+                };
                 
-                // Serializar jogador local
-                const playerData = this.game.serializePlayer(this.game.localPlayer);
-                
-                // Enviar atualização
-                this.broadcast({
-                    type: 'player-update',
-                    player: playerData
+                // Enviar para todos
+                broadcast(data);
+            }
+            
+            function sendHitInfo(targetId, damage) {
+                // Enviar informação de hit
+                sendTo(targetId, {
+                    type: 'hit',
+                    targetId: targetId,
+                    damage: damage,
+                    attackerId: peer.id
                 });
             }
             
-            sendHitInfo(targetId, damage) {
-                if (!this.game.localPlayer) {
-                    return;
-                }
-                
-                // Enviar informação do tiro
-                if (this.isHost) {
-                    // Se somos o host, podemos enviar diretamente
-                    this.sendTo(targetId, {
-                        type: 'hit',
-                        targetId: targetId,
-                        damage: damage,
-                        attackerId: this.peer.id
-                    });
-                } else {
-                    // Se não somos o host, enviamos para o host processar
-                    this.sendTo(this.gameId, {
-                        type: 'hit',
-                        targetId: targetId,
-                        damage: damage,
-                        attackerId: this.peer.id
-                    });
-                }
-            }
-            
-            sendChatMessage(message) {
-                if (!this.game.localPlayer) {
-                    return;
-                }
-                
-                // Enviar mensagem de chat
-                this.broadcast({
-                    type: 'chat-message',
-                    playerId: this.peer.id,
-                    playerName: this.game.localPlayer.name,
-                    message: message
-                });
-            }
-            
-            sendTo(peerId, data) {
-                if (this.connections[peerId]) {
+            function sendTo(peerId, data) {
+                if (connections[peerId]) {
                     try {
-                        this.connections[peerId].send(data);
+                        connections[peerId].send(data);
                     } catch (error) {
-                        console.error('Error sending data to', peerId, error);
+                        console.error('Error sending data:', error);
                     }
                 }
             }
             
-            broadcast(data, exclude = []) {
-                for (const peerId in this.connections) {
+            function broadcast(data, exclude = []) {
+                for (const peerId in connections) {
                     if (!exclude.includes(peerId)) {
-                        this.sendTo(peerId, data);
+                        sendTo(peerId, data);
                     }
                 }
             }
             
-            dispose() {
-                // Fechar todas as conexões
-                for (const peerId in this.connections) {
-                    this.connections[peerId].close();
-                }
-                
-                // Fechar peer
-                if (this.peer) {
-                    this.peer.destroy();
-                }
-                
-                // Limpar variáveis
-                this.connections = {};
-                this.peer = null;
-                this.isHost = false;
-                this.gameId = null;
+            // Funções auxiliares
+            function generateId() {
+                return Math.random().toString(36).substring(2, 9);
             }
-        }
-
-        // Inicializar o jogo quando a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            // Lidar com erros globalmente
-            window.addEventListener('error', (event) => {
-                console.error('Game error:', event.error);
+            
+            // Funções de menu
+            function startGame() {
+                // Esconder menu
+                menu.style.display = 'none';
+                gameUI.style.display = 'block';
+                
+                // Iniciar captura do mouse
+                document.body.requestPointerLock();
+                
+                // Iniciar jogo
+                isPlaying = true;
+            }
+            
+            function endGame() {
+                // Mostrar menu
+                isPlaying = false;
+                menu.style.display = 'flex';
+                gameUI.style.display = 'none';
+                
+                // Limpar jogadores
+                for (const id in players) {
+                    if (id !== peer.id) {
+                        scene.remove(players[id].object);
+                    }
+                }
+                
+                // Resetar conexões
+                for (const id in connections) {
+                    connections[id].close();
+                }
+                
+                connections = {};
+                
+                // Manter apenas jogador local
+                const myId = peer.id;
+                const localPlayer = players[myId];
+                players = {};
+                
+                if (localPlayer) {
+                    players[myId] = localPlayer;
+                }
+                
+                // Resetar status
+                health = 100;
+                ammo = { current: 30, total: 90 };
+                isDead = false;
+                kills = 0;
+                deaths = 0;
+                weaponType = 'rifle';
+                isReloading = false;
+                
+                // Resetar posição
+                playerObject.position.set(0, 0, 0);
+                playerBox.visible = true;
+                
+                // Libertar mouse
+                if (document.pointerLockElement) {
+                    document.exitPointerLock();
+                }
+                
+                // Limpar UI
+                killFeedUI.innerHTML = '';
+                playersListUI.innerHTML = '';
+            }
+            
+            // Configurar botões do menu
+            createBtn.addEventListener('click', () => {
+                if (!nameInput.value.trim()) {
+                    alert('Por favor, insira seu nome.');
+                    return;
+                }
+                
+                createHostGame();
             });
             
-            // Iniciar o jogo
-            new Game();
+            joinBtn.addEventListener('click', () => {
+                joinForm.style.display = joinForm.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            connectBtn.addEventListener('click', () => {
+                if (!nameInput.value.trim()) {
+                    alert('Por favor, insira seu nome.');
+                    return;
+                }
+                
+                joinExistingGame();
+            });
+            
+            // Inicializar jogo e rede
+            initNetwork();
+            initGame();
         });
     </script>
 </body>
