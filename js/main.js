@@ -82,12 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Display alert if WebGL is not supported
-if (THREE.WEBGL) {
-    if (!THREE.WEBGL.isWebGLAvailable()) {
-        const warning = THREE.WEBGL.getWebGLErrorMessage();
-        document.getElementById('game-container').appendChild(warning);
-    }
+// Verificação WebGL simplificada
+if (!window.WebGLRenderingContext) {
+    alert('Seu navegador não suporta WebGL, necessário para executar este jogo.');
 }
 
 // Create placeholder image for menu background if missing

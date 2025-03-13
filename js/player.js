@@ -52,8 +52,8 @@ class Player {
         this.model = new THREE.Group();
         this.model.position.y = PLAYER.HEIGHT / 2;
         
-        // Create player body (using cylinder instead of capsule for compatibility)
-        const bodyGeometry = new THREE.CylinderGeometry(PLAYER.RADIUS, PLAYER.RADIUS, PLAYER.HEIGHT, 8);
+        // Create player body (using simple box geometry for maximum compatibility)
+        const bodyGeometry = new THREE.BoxGeometry(PLAYER.RADIUS*2, PLAYER.HEIGHT, PLAYER.RADIUS*2);
         const bodyMaterial = new THREE.MeshLambertMaterial({
             color: this.isLocal ? 0x0000ff : 0xff0000
         });
