@@ -239,6 +239,36 @@
             let deaths = 0;
             let weaponType = 'rifle';
             let isReloading = false;
+            let bulletLines = [];
+
+            // Criar efeitos sonoros
+            const createShotSound = () => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Criar oscilador para som de tiro
+                const createShot = () => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    // Configurar som de tiro (tipo "laser" rápido)
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioContext.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.1);
+                    
+                    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.start();
+                    osc.stop(audioContext.currentTime + 0.2);
+                };
+                
+                return createShot;
+            };
+            
+            let playShotSound;
             
             // Inicialização do Three.js
             function initGame() {
@@ -254,6 +284,14 @@
                 renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 gameContainer.appendChild(renderer.domElement);
+                
+                // Inicializar som de tiro
+                try {
+                    playShotSound = createShotSound();
+                } catch (e) {
+                    console.warn('Áudio não suportado:', e);
+                    playShotSound = () => {}; // Função vazia caso áudio não seja suportado
+                }
                 
                 // Criar mapa
                 createMap();
@@ -506,8 +544,8 @@
                 // Rotação horizontal
                 camera.rotation.y -= movementX * 0.002;
                 
-                // Rotação vertical (limitada)
-                mouseControls.y -= movementY * 0.002;
+                // Rotação vertical (limitada) - CORRIGIDO: movimentY agora é positivo para olhar para cima
+                mouseControls.y += movementY * 0.002; // Invertido o sinal aqui
                 mouseControls.y = Math.max(-Math.PI/2, Math.min(Math.PI/2, mouseControls.y));
                 camera.rotation.x = mouseControls.y;
             }
@@ -521,6 +559,9 @@
             function shoot() {
                 if (isDead || isReloading || ammo.current <= 0) return;
                 
+                // Tocar som de tiro
+                playShotSound();
+                
                 // Diminuir munição
                 ammo.current--;
                 
@@ -531,6 +572,12 @@
                 const raycaster = new THREE.Raycaster();
                 raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
                 
+                // Ponto inicial - posição da câmera
+                const startPoint = camera.position.clone();
+                
+                // Ponto final padrão (100 unidades na direção da mira)
+                let endPoint = startPoint.clone().add(raycaster.ray.direction.clone().multiplyScalar(100));
+                
                 // Verificar todos os jogadores exceto o local
                 const targets = [];
                 for (const id in players) {
@@ -539,12 +586,13 @@
                     }
                 }
                 
-                // Se não há alvos, não continuar
-                if (targets.length === 0) return;
-                
+                // Verificar colisões
                 const intersects = raycaster.intersectObjects(targets);
                 
                 if (intersects.length > 0) {
+                    // Atualizar ponto final para o ponto de colisão
+                    endPoint = intersects[0].point;
+                    
                     // Identificar jogador atingido
                     const hitObject = intersects[0].object;
                     let hitPlayerId = null;
@@ -573,9 +621,93 @@
                     }
                 }
                 
+                // Criar linha de tiro tracejada
+                createBulletLine(startPoint, endPoint);
+                
                 // Verificar recarga
                 if (ammo.current === 0 && ammo.total > 0) {
                     reload();
+                }
+            }
+            
+            // Criar linha tracejada para o tiro
+            function createBulletLine(start, end) {
+                // Criar pontos para linha tracejada
+                const points = [];
+                const segmentLength = 0.5; // Tamanho de cada segmento
+                const gap = 0.2; // Tamanho do espaço entre segmentos
+                
+                // Calcular direção e distância
+                const direction = end.clone().sub(start).normalize();
+                const distance = start.distanceTo(end);
+                
+                // Criar pontos para cada segmento
+                let currentDist = 0;
+                while (currentDist < distance) {
+                    // Adicionar início do segmento
+                    points.push(start.clone().add(direction.clone().multiplyScalar(currentDist)));
+                    
+                    // Calcular final do segmento
+                    const segmentEnd = Math.min(currentDist + segmentLength, distance);
+                    points.push(start.clone().add(direction.clone().multiplyScalar(segmentEnd)));
+                    
+                    // Avançar para o próximo segmento
+                    currentDist += segmentLength + gap;
+                }
+                
+                // Criar material colorido baseado na arma atual
+                let bulletColor;
+                switch (weaponType) {
+                    case 'pistol': bulletColor = 0xffff00; break; // Amarelo
+                    case 'rifle': bulletColor = 0x00ffff; break;  // Ciano
+                    case 'shotgun': bulletColor = 0xff0000; break; // Vermelho
+                    default: bulletColor = 0xffffff; // Branco
+                }
+                
+                // Criar geometria da linha
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({ 
+                    color: bulletColor,
+                    linewidth: 3
+                });
+                
+                // Criar linha e adicionar à cena
+                const line = new THREE.LineSegments(geometry, material);
+                scene.add(line);
+                
+                // Adicionar à lista de linhas de tiro
+                bulletLines.push({
+                    line: line,
+                    createdAt: Date.now()
+                });
+            }
+            
+            // Atualizar e remover linhas de tiro
+            function updateBulletLines() {
+                const now = Date.now();
+                const linesToRemove = [];
+                
+                // Verificar cada linha
+                for (let i = 0; i < bulletLines.length; i++) {
+                    const bullet = bulletLines[i];
+                    const age = now - bullet.createdAt;
+                    
+                    // Duração de 200ms
+                    if (age > 200) {
+                        // Remover da cena e marcar para remoção da lista
+                        scene.remove(bullet.line);
+                        bullet.line.geometry.dispose();
+                        bullet.line.material.dispose();
+                        linesToRemove.push(i);
+                    } else {
+                        // Atualizar opacidade
+                        bullet.line.material.opacity = 1 - (age / 200);
+                    }
+                }
+                
+                // Remover da lista (de trás para frente para evitar problemas de índice)
+                for (let i = linesToRemove.length - 1; i >= 0; i--) {
+                    bulletLines.splice(linesToRemove[i], 1);
                 }
             }
             
@@ -790,6 +922,9 @@
                     camera.position.x = playerObject.position.x;
                     camera.position.z = playerObject.position.z;
                     camera.position.y = playerObject.position.y + PLAYER_HEIGHT;
+                    
+                    // Atualizar linhas de tiro
+                    updateBulletLines();
                     
                     // Enviar atualização de posição
                     const now = Date.now();
@@ -1137,6 +1272,14 @@
                         scene.remove(players[id].object);
                     }
                 }
+                
+                // Limpar linhas de tiro
+                bulletLines.forEach(bullet => {
+                    scene.remove(bullet.line);
+                    bullet.line.geometry.dispose();
+                    bullet.line.material.dispose();
+                });
+                bulletLines = [];
                 
                 // Resetar conexões
                 for (const id in connections) {
