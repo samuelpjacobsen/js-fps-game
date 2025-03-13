@@ -544,8 +544,9 @@
                 // Rotação horizontal
                 camera.rotation.y -= movementX * 0.002;
                 
-                // Rotação vertical (limitada) - CORRIGIDO: movimentY agora é positivo para olhar para cima
-                mouseControls.y += movementY * 0.002; // Invertido o sinal aqui
+                // Rotação vertical (limitada) - CORRIGIDO NOVAMENTE: 
+                // Agora o movimentY negativo olha para baixo (direção natural)
+                mouseControls.y -= movementY * 0.002;
                 mouseControls.y = Math.max(-Math.PI/2, Math.min(Math.PI/2, mouseControls.y));
                 camera.rotation.x = mouseControls.y;
             }
@@ -1074,16 +1075,10 @@
                         
                         // Se somos o host, informar outros jogadores
                         if (isHost) {
-                            broadcast({
-                                type: 'player_join',
-                                id: data.id,
-                                name: data.name,
-                                position: data.position
-                            }, [data.id]);
-                            
-                            // Enviar informações de outros jogadores
+                            // Enviar informações de todos os jogadores ao novo jogador
+                            // Incluindo o próprio host
                             for (const id in players) {
-                                if (id !== peer.id && id !== data.id) {
+                                if (id !== data.id) {
                                     connections[data.id].send({
                                         type: 'player_join',
                                         id: id,
@@ -1096,6 +1091,14 @@
                                     });
                                 }
                             }
+                            
+                            // Informar outros jogadores sobre o novo jogador
+                            broadcast({
+                                type: 'player_join',
+                                id: data.id,
+                                name: data.name,
+                                position: data.position
+                            }, [data.id]);
                         }
                         break;
                         
