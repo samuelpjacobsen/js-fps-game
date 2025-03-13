@@ -23,9 +23,15 @@ class GameMap {
             return;
         }
         
-        // Create ground
+        // Create ground with dynamic texture
+        const groundCanvas = window.TextureGenerator.generateGroundTexture();
+        const groundTexture = new THREE.CanvasTexture(groundCanvas);
+        groundTexture.wrapS = THREE.RepeatWrapping;
+        groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set(10, 10);
+        
         const groundGeometry = new THREE.PlaneGeometry(MAP.SIZE, MAP.SIZE, 1, 1);
-        const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
+        const groundMaterial = new THREE.MeshLambertMaterial({ map: groundTexture });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;

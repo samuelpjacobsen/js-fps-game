@@ -62,51 +62,14 @@ class Game {
      * Load game resources
      */
     loadResources() {
-        const textureLoader = new THREE.TextureLoader();
-        const modelLoader = new THREE.GLTFLoader();
-        
-        // Simple progress tracking
-        let totalResources = 2; // Add more as needed
-        let loadedResources = 0;
-        
-        const updateProgress = () => {
-            loadedResources++;
-            const progress = (loadedResources / totalResources) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('loading-text').textContent = `Carregando... ${Math.floor(progress)}%`;
-            
-            // If all resources are loaded, go to menu
-            if (loadedResources >= totalResources) {
-                setTimeout(() => {
-                    this.setState(GAME_STATES.MENU);
-                }, 500);
-            }
-        };
-        
-        // Load textures
-        textureLoader.load('textures/ground.jpg', texture => {
-            // Store texture or use it right away
-            updateProgress();
-        }, undefined, error => {
-            console.error('Error loading texture:', error);
-            updateProgress();
-        });
-        
-        // Load models
-        modelLoader.load('models/weapon.glb', gltf => {
-            // Store model or use it right away
-            updateProgress();
-        }, undefined, error => {
-            console.error('Error loading model:', error);
-            updateProgress();
-        });
-        
-        // Simulate loading for demo
-        if (totalResources === 0) {
+        // Simplified loading without external resources
+        setTimeout(() => {
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('loading-text').textContent = 'Carregando... 100%';
             setTimeout(() => {
                 this.setState(GAME_STATES.MENU);
-            }, 1000);
-        }
+            }, 500);
+        }, 1000);
     }
     
     /**
@@ -622,5 +585,94 @@ let game;
 
 // Initialize when DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
+    // Add global error handling
+    window.addEventListener('error', (event) => {
+        console.error('Game error:', event.error);
+    });
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', (event) => {
+        // F11 for fullscreen
+        if (event.key === 'F11') {
+            event.preventDefault();
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error('Error enabling fullscreen:', err);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    });
+    
+    // Add custom CSS for better crosshair
+    const style = document.createElement('style');
+    style.textContent = `
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border: 2px solid white;
+            border-radius: 50%;
+            z-index: 1000;
+        }
+        
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: white;
+        }
+        
+        #crosshair::before {
+            width: 2px;
+            height: 6px;
+            top: 3px;
+            left: 5px;
+        }
+        
+        #crosshair::after {
+            width: 6px;
+            height: 2px;
+            top: 5px;
+            left: 3px;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Update crosshair element
+    const crosshair = document.getElementById('crosshair');
+    if (crosshair) {
+        crosshair.innerHTML = '';
+    }
+    
+    // Add some game instructions to the menu
+    const menuScreen = document.getElementById('menu-screen');
+    if (menuScreen) {
+        const instructions = document.createElement('div');
+        instructions.style.marginTop = '30px';
+        instructions.style.textAlign = 'center';
+        instructions.style.color = 'white';
+        instructions.style.maxWidth = '600px';
+        instructions.innerHTML = `
+            <h3>Instruções</h3>
+            <p>WASD - Movimento</p>
+            <p>Mouse - Olhar</p>
+            <p>Clique - Atirar</p>
+            <p>R - Recarregar</p>
+            <p>1-3 - Mudar armas</p>
+            <p>Espaço - Pular</p>
+            <p>T - Chat</p>
+            <p>ESC - Liberar mouse</p>
+            <p>F11 - Tela cheia</p>
+        `;
+        menuScreen.appendChild(instructions);
+    }
+
+    // Create the game
     game = new Game();
 });
